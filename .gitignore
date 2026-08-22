@@ -1,2 +1,8 @@
-.granite
-.granite-dist
+node_modules/
+dist/
+.granite/
+.granite-dist/
+.env
+.env.local
+*.log
+.DS_Store
