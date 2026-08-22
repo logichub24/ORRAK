@@ -6,11 +6,14 @@ import {
   getCognitiveConditionReport,
   getDailyBrief,
   getFocusRoutine,
+  getFocusPersona,
+  getPatternForecast,
   getPredictiveAlert,
   getRecommendedMeasurementTime,
   getSkipCostMessage,
   getTaskRecommendation,
   getTimeSlotAnalysis,
+  getTodayGoal,
 } from "../lib/progression";
 import { getAssetStatus, getDailyTheme, getHomeDecisionBundle } from "../lib/engagement";
 import { SoundManager } from "../lib/soundManager";
@@ -217,6 +220,20 @@ function HomeCognitiveStatusCard({ report }) {
       <div className="mt-2 rounded-xl border border-cyan-200 bg-cyan-50 px-3 py-2.5">
         <div className="text-[10px] font-black text-cyan-700">오늘 추천 업무</div>
         <div className="mt-1 text-[13px] font-black leading-relaxed text-slate-900">{report.suitableTasks.join(" · ")}</div>
+      </div>
+    </div>
+  );
+}
+
+function CuriosityCard({ goal, forecast, persona, assetStatus }) {
+  return (
+    <div className="rounded-2xl border border-violet-200 bg-gradient-to-br from-violet-50 to-white px-4 py-3.5 shadow-sm">
+      <div className="text-[11px] font-extrabold tracking-[0.18em] text-violet-700">NEXT SIGNAL</div>
+      <div className="mt-1 text-[17px] font-black text-slate-950">다음 기록에서 밝혀질 것</div>
+      <div className="mt-2.5 grid gap-2">
+        <div className="rounded-xl bg-white/90 px-3 py-2"><div className="text-[10px] font-black text-violet-700">오늘 미션</div><div className="mt-1 text-[12px] font-black text-slate-900">{goal.title}</div></div>
+        <div className="rounded-xl bg-white/90 px-3 py-2"><div className="text-[10px] font-black text-violet-700">내일 예측</div><div className="mt-1 text-[12px] font-black text-slate-900">{forecast.opportunity}</div></div>
+        <div className="rounded-xl bg-white/90 px-3 py-2"><div className="text-[10px] font-black text-violet-700">다음 해금</div><div className="mt-1 text-[12px] font-black text-slate-900">{assetStatus.nextUnlock || `${persona.name} 페르소나 심화`}</div></div>
       </div>
     </div>
   );
@@ -485,6 +502,9 @@ export function HomeScreen({ onStart, onCoach, dataService }) {
     challenge: dataService.challenge,
     predictiveAlert,
   });
+  const curiosityGoal = getTodayGoal({ isTodayDone, streak, patternSnapshot: dataService.stats, recommendedTime });
+  const curiosityForecast = getPatternForecast(dataService.data.records || []);
+  const curiosityPersona = getFocusPersona(todayResult || { score: 0, falls: 0 });
 
   const todayStr = new Date().toLocaleDateString("ko-KR", {
     month: "long",
@@ -568,6 +588,7 @@ export function HomeScreen({ onStart, onCoach, dataService }) {
                 skipCost={skipCost}
               />
             )}
+            <CuriosityCard goal={curiosityGoal} forecast={curiosityForecast} persona={curiosityPersona} assetStatus={assetStatus} />
           </>
         ) : null}
 
