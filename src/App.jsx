@@ -87,7 +87,9 @@ async function runRewardOrFallback({ onFallbackOverlay, onRewarded }) {
     });
 
     if (result.shown) {
+      trackEvent("reward_ad_shown", { rewarded: result.rewarded });
       if (result.rewarded) {
+        trackEvent("reward_ad_rewarded");
         onRewarded();
       }
       return;
@@ -108,8 +110,8 @@ async function runRewardOrFallback({ onFallbackOverlay, onRewarded }) {
 }
 
 function shouldShowResultInterstitial(totalPlays) {
-  if (getDistributionChannel() !== "onestore") return true;
-  if (totalPlays < 1 || (totalPlays + 1) % 2 !== 0) return false;
+  if (totalPlays < 1) return false;
+  if (getDistributionChannel() === "onestore" && (totalPlays + 1) % 2 !== 0) return false;
 
   const lastShownAt = Number(window.localStorage.getItem("orrak-last-result-ad-at") || 0);
   return Date.now() - lastShownAt >= 10 * 60 * 1000;

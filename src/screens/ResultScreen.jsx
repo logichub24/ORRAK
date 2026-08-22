@@ -27,6 +27,7 @@ import { getRetestPlan, getSharePersonaSummary } from "../lib/engagement";
 import { SoundManager } from "../lib/soundManager";
 import { getAgeComparison, getGrade, getInterpretation } from "../lib/scoring";
 import { grantResultPromotionReward } from "../lib/promotionReward";
+import { trackEvent } from "../lib/analytics";
 
 function SegmentTabs({ value, onChange, items }) {
   return (
@@ -553,12 +554,13 @@ export function ResultScreen({
                   type="button"
                   onClick={() => {
                     SoundManager.playClick();
+                    trackEvent("reward_cta_click", { placement: "deep_analysis" });
                     onUnlockInsights();
                   }}
                   className="mt-3 flex w-full items-center justify-center rounded-xl bg-rose-500 py-3 text-sm font-black text-white shadow-sm transition-colors hover:bg-rose-600"
                 >
                   <Video className="mr-1.5 h-4.5 w-4.5" />
-                  광고 보고 심층 분석 열기
+                  광고 1회 보고 심층 분석 열기
                 </button>
               </SectionCard>
             ) : (
