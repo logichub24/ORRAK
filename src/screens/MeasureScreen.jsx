@@ -35,18 +35,21 @@ const STAGE_VARIANTS = {
   reaction: [
     {
       variantId: "signal",
+      control: "tap",
       title: "신호 반응",
       prompt: "불이 들어온 원을 빠르게 눌러주세요.",
       instruction: "4개의 원 중 빛나는 위치만 누르세요.",
     },
     {
       variantId: "color",
+      control: "tap",
       title: "색상 반응",
       prompt: "지정된 색이 뜨면 빠르게 눌러주세요.",
       instruction: "목표 색과 같은 버튼만 누르세요.",
     },
     {
       variantId: "direction",
+      control: "swipe",
       title: "방향 반응",
       prompt: "화살표 방향과 같은 버튼을 눌러주세요.",
       instruction: "방향을 보고 맞는 위치를 선택하세요.",
@@ -55,21 +58,25 @@ const STAGE_VARIANTS = {
   focus: [
     {
       variantId: "shape",
+      control: "tap",
       title: "다른 도형 찾기",
       prompt: "비슷한 도형 속에서 다른 하나를 찾으세요.",
     },
     {
       variantId: "number",
+      control: "tap",
       title: "숫자 찾기",
       prompt: "목표 숫자와 같은 칸을 빠르게 고르세요.",
     },
     {
       variantId: "symbol",
+      control: "tap",
       title: "기호 구분",
       prompt: "비슷한 기호 중 다른 하나를 찾으세요.",
     },
     {
       variantId: "word",
+      control: "tap",
       title: "방해 문자 무시",
       prompt: "방해 단어 사이에서 목표 단어만 고르세요.",
     },
@@ -77,16 +84,19 @@ const STAGE_VARIANTS = {
   flow: [
     {
       variantId: "platform",
+      control: "hold",
       title: "지속 점프",
       prompt: "좌우로 이동하며 리듬을 유지하세요.",
     },
     {
       variantId: "rhythm",
+      control: "rhythm",
       title: "리듬 유지",
       prompt: "박자에 맞춰 초록 신호 때 눌러주세요.",
     },
     {
       variantId: "sequence",
+      control: "memory",
       title: "순서 기억",
       prompt: "짧게 보인 순서를 기억해 그대로 누르세요.",
     },
@@ -98,11 +108,13 @@ function pickRandom(items) {
 }
 
 function createMeasureSession() {
-  return MEASURE_STAGES.map((baseStage) => ({
-    ...baseStage,
-    ...pickRandom(STAGE_VARIANTS[baseStage.id]),
-    baseTitle: baseStage.title,
-  }));
+  const controls = new Set();
+  return MEASURE_STAGES.map((baseStage) => {
+    const candidates = STAGE_VARIANTS[baseStage.id].filter((item) => !controls.has(item.control));
+    const variant = pickRandom(candidates.length ? candidates : STAGE_VARIANTS[baseStage.id]);
+    controls.add(variant.control);
+    return { ...baseStage, ...variant, baseTitle: baseStage.title };
+  });
 }
 
 function getRemainingTotalTime(stages, stageIndex, stageTimeLeft) {
@@ -349,6 +361,7 @@ function ReactionStage({ stage, onProgress, onComplete }) {
   const spawnTimeoutRef = useRef(null);
   const missTimeoutRef = useRef(null);
   const doneRef = useRef(false);
+  const swipeStartRef = useRef(null);
   const { timeLeft, isExpired } = useStageTimer(duration, onProgress, score);
 
   const clearReactionTimers = useCallback(() => {
@@ -446,6 +459,16 @@ function ReactionStage({ stage, onProgress, onComplete }) {
     }, 220);
   };
 
+  const handleSwipeEnd = (event) => {
+    const start = swipeStartRef.current;
+    swipeStartRef.current = null;
+    if (!start) return;
+    const dx = event.clientX - start.x;
+    const dy = event.clientY - start.y;
+    if (Math.max(Math.abs(dx), Math.abs(dy)) < 36) return;
+    handleTap(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? "right" : "left") : (dy > 0 ? "down" : "up"));
+  };
+
   return (
     <StageSurface icon={Zap} title={stage.title} description={stage.prompt} score={score} timeLeft={timeLeft} accent="cyan">
       <div className="mx-auto mt-5 w-full max-w-sm">
@@ -456,7 +479,15 @@ function ReactionStage({ stage, onProgress, onComplete }) {
           <div className="mt-1 text-lg font-black text-white">{getReactionPrompt(stage.variantId, target)}</div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        {stage.variantId === "direction" ? (
+          <div
+            className="flex h-52 touch-none items-center justify-center rounded-3xl border border-cyan-200 bg-cyan-300 text-7xl font-black text-slate-950 shadow-[0_0_40px_rgba(103,232,249,0.4)]"
+            onPointerDown={(event) => { swipeStartRef.current = { x: event.clientX, y: event.clientY }; }}
+            onPointerUp={handleSwipeEnd}
+          >
+            {target.glyph}
+          </div>
+        ) : <div className="grid grid-cols-2 gap-4">
           {getReactionButtons(stage.variantId).map((button) => {
             const isActive = phase === "active" && button.id === target.answerId;
             return (
@@ -474,7 +505,7 @@ function ReactionStage({ stage, onProgress, onComplete }) {
               </button>
             );
           })}
-        </div>
+        </div>}
 
         <div className="mt-4 rounded-2xl border border-white/10 bg-slate-900/72 px-4 py-3 text-center backdrop-blur">
           <div className="text-[11px] font-extrabold tracking-[0.18em] text-cyan-300/80">
