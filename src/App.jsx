@@ -299,7 +299,7 @@ export default function App() {
   };
 
   const handleSplashDone = () => {
-    setScreen(needsOnboarding ? "onboarding" : "home");
+    setScreen("home");
   };
 
   const handleOnboardingDone = () => {
@@ -315,7 +315,7 @@ export default function App() {
   };
 
   const showBottomNav = screen !== "splash" && screen !== "measure" && screen !== "onboarding";
-  const bottomDockHeight = showBottomNav ? 82 : 0;
+  const bottomDockHeight = showBottomNav ? 94 : 0;
 
   return (
     <div
@@ -380,7 +380,7 @@ export default function App() {
       </div>
 
       {showBottomNav ? (
-        <div className="absolute inset-x-0 bottom-0 z-20 overflow-hidden border-t border-slate-200 bg-white shadow-[0_-10px_28px_rgba(15,23,42,0.12)]">
+        <div className="absolute inset-x-3 bottom-[max(env(safe-area-inset-bottom),12px)] z-20 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_10px_28px_rgba(15,23,42,0.18)]">
           {showBottomNav ? (
             <BottomNavigation
               screen={screen}
