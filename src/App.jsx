@@ -190,6 +190,7 @@ export default function App() {
 
 
   const handleMeasureDone = async (result) => {
+    trackEvent("measure_complete", { score: result.score, duration: result.duration, falls: result.falls });
     const existingRecords = dataService.data.records || [];
     const today = getToday();
     const todayRecord = existingRecords.find((record) => record.date === today);
@@ -261,6 +262,7 @@ export default function App() {
   };
 
   const handleRetry = async () => {
+    trackEvent("result_revisit_cta_click", { action: "retry_measure" });
     trackEvent("reward_requested", { feature: "retry_measure" });
     await runRewardOrFallback({
       onRewarded: () => {

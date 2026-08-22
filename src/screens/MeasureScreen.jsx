@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { ArrowRight, Brain, Crosshair, Gauge, Orbit, Zap } from "lucide-react";
 import { SoundManager } from "../lib/soundManager";
 import { finalizeBatteryResults, MEASURE_STAGES } from "../lib/measureBattery";
+import { trackEvent } from "../lib/analytics";
 
 const CANVAS_WIDTH = 360;
 const CANVAS_HEIGHT = 640;
@@ -132,6 +133,7 @@ export function MeasureScreen({ onDone }) {
     setStageIndex(0);
     setStageSnapshot({ score: 0, timeLeft: nextSession[0].duration });
     setPhase("running");
+    trackEvent("measure_start", { stageCount: nextSession.length });
   };
 
   const handleStageProgress = (snapshot) => {
@@ -143,6 +145,7 @@ export function MeasureScreen({ onDone }) {
     setCompletedStages(nextCompleted);
     setLastStageResult(stageResult);
     SoundManager.playSuccess();
+    trackEvent("measure_stage_complete", { stage: stageResult.id, score: stageResult.score });
 
     if (stageIndex >= sessionStages.length - 1) {
       onDone(finalizeBatteryResults(nextCompleted));

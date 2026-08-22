@@ -15,6 +15,7 @@ import {
 import { getAssetStatus, getDailyTheme, getHomeDecisionBundle } from "../lib/engagement";
 import { SoundManager } from "../lib/soundManager";
 import { getGrade } from "../lib/scoring";
+import { trackEvent } from "../lib/analytics";
 
 function FocusRoutineModal({ open, onClose, routine, reminderTime, onApplyReminder }) {
   if (!open || typeof document === "undefined") return null;
@@ -76,11 +77,12 @@ function HeroCard({ isTodayDone, todayResult, grade, rankSnapshot, onStart }) {
     <button
       onClick={() => {
         SoundManager.playClick();
+        trackEvent("home_cta_click", { variant: "score_promise" });
         onStart();
       }}
       className="inline-flex min-h-[44px] items-center rounded-full bg-cyan-500 px-6 py-2.5 text-[15px] font-black text-white shadow-[0_8px_18px_rgba(6,182,212,0.28)]"
     >
-      지금 바로 시작
+      60초 집중력 점수 확인
       <ArrowRight className="ml-1.5 h-4 w-4" />
     </button>
   );
