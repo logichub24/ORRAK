@@ -1,0 +1,16 @@
+Failed to find Response internal state key
+(node:19336) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+[2mPM 5:17:48[22m [31m[1m[vite][22m[39m Pre-transform error: spawn EPERM
+[2mPM 5:17:48[22m [31m[1m[vite][22m[39m [31mInternal server error: spawn EPERM[39m
+      at ChildProcess.spawn (node:internal/child_process:441:11)
+      at spawn (node:child_process:796:9)
+      at Object.execFile (node:child_process:349:17)
+      at exec (node:child_process:236:25)
+      at optimizeSafeRealPathSync (file:///D:/toss-app/%EC%98%A4%EB%A5%B4%EB%9D%BD(ORRAK)/node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:6938:3)
+      at windowsSafeRealPathSync (file:///D:/toss-app/%EC%98%A4%EB%A5%B4%EB%9D%BD(ORRAK)/node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:6919:5)
+      at getRealPath (file:///D:/toss-app/%EC%98%A4%EB%A5%B4%EB%9D%BD(ORRAK)/node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:16363:16)
+      at tryResolveRealFileOrType (file:///D:/toss-app/%EC%98%A4%EB%A5%B4%EB%9D%BD(ORRAK)/node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:16354:20)
+      at tryCleanFsResolve (file:///D:/toss-app/%EC%98%A4%EB%A5%B4%EB%9D%BD(ORRAK)/node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:15954:22)
+      at tryFsResolve (file:///D:/toss-app/%EC%98%A4%EB%A5%B4%EB%9D%BD(ORRAK)/node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:15947:15)
+[2mPM 5:21:07[22m [31m[1m[vite][22m[39m Pre-transform error: spawn EPERM
