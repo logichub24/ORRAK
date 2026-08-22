@@ -121,7 +121,7 @@ function HeroCard({ isTodayDone, todayResult, grade, rankSnapshot, onStart }) {
   }
 
   return (
-    <div className="relative overflow-hidden rounded-[1.65rem] border border-cyan-100 bg-gradient-to-br from-white via-cyan-50/40 to-sky-50 px-5 pb-4 pt-4 shadow-[0_10px_24px_rgba(15,23,42,0.11)]">
+    <div className="relative min-h-[156px] shrink-0 overflow-hidden rounded-[1.65rem] border border-cyan-100 bg-gradient-to-br from-white via-cyan-50/40 to-sky-50 px-5 pb-4 pt-4 shadow-[0_10px_24px_rgba(15,23,42,0.11)]">
       <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-cyan-100 opacity-70 blur-[55px]" />
       <div className="absolute -left-8 bottom-0 h-24 w-24 rounded-full bg-sky-100 opacity-40 blur-[45px]" />
 
@@ -230,10 +230,10 @@ function CuriosityCard({ goal, forecast, persona, assetStatus }) {
     <div className="rounded-2xl border border-violet-200 bg-gradient-to-br from-violet-50 to-white px-4 py-3.5 shadow-sm">
       <div className="text-[11px] font-extrabold tracking-[0.18em] text-violet-700">NEXT SIGNAL</div>
       <div className="mt-1 text-[17px] font-black text-slate-950">다음 기록에서 밝혀질 것</div>
-      <div className="mt-2.5 grid gap-2">
-        <div className="rounded-xl bg-white/90 px-3 py-2"><div className="text-[10px] font-black text-violet-700">오늘 미션</div><div className="mt-1 text-[12px] font-black text-slate-900">{goal.title}</div></div>
-        <div className="rounded-xl bg-white/90 px-3 py-2"><div className="text-[10px] font-black text-violet-700">내일 예측</div><div className="mt-1 text-[12px] font-black text-slate-900">{forecast.opportunity}</div></div>
-        <div className="rounded-xl bg-white/90 px-3 py-2"><div className="text-[10px] font-black text-violet-700">다음 해금</div><div className="mt-1 text-[12px] font-black text-slate-900">{assetStatus.nextUnlock || `${persona.name} 페르소나 심화`}</div></div>
+      <div className="mt-2.5 grid grid-cols-3 gap-1.5">
+        <div className="rounded-xl bg-white/90 px-2.5 py-2"><div className="text-[10px] font-black text-violet-700">오늘 미션</div><div className="mt-1 text-[11px] font-black leading-snug text-slate-900">{goal.title}</div></div>
+        <div className="rounded-xl bg-white/90 px-2.5 py-2"><div className="text-[10px] font-black text-violet-700">내일 예측</div><div className="mt-1 text-[11px] font-black leading-snug text-slate-900">{forecast.opportunity}</div></div>
+        <div className="rounded-xl bg-white/90 px-2.5 py-2"><div className="text-[10px] font-black text-violet-700">다음 해금</div><div className="mt-1 text-[11px] font-black leading-snug text-slate-900">{assetStatus.nextUnlock || `${persona.name} 페르소나`}</div></div>
       </div>
     </div>
   );
@@ -552,7 +552,7 @@ export function HomeScreen({ onStart, onCoach, dataService }) {
         <SegmentTabButton active={activeSegment === "pattern"} label="패턴" onClick={() => setActiveSegment("pattern")} />
       </div>
 
-      <div ref={scrollRef} className="scrollbar-none flex min-h-0 flex-1 flex-col gap-2.5 overflow-y-auto pb-3 pt-0.5">
+      <div ref={scrollRef} className="scrollbar-none flex min-h-0 flex-1 flex-col gap-2.5 overflow-y-auto pb-28 pt-0.5">
         {activeSegment === "today" ? (
           <>
             {streak >= 2 ? (
