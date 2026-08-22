@@ -6,6 +6,9 @@ import { trackEvent } from "../lib/analytics";
 
 const CANVAS_WIDTH = 360;
 const CANVAS_HEIGHT = 640;
+const REACTION_INPUT_WINDOW_MS = 2000;
+const FOCUS_INPUT_WINDOW_MS = 3500;
+const RHYTHM_INPUT_WINDOW_MS = 650;
 
 const REACTION_TARGETS = [
   { id: "top-left", label: "좌상" },
@@ -369,7 +372,7 @@ function ReactionStage({ stage, onProgress, onComplete }) {
         window.setTimeout(() => {
           if (!doneRef.current) scheduleTarget(260);
         }, 220);
-      }, 1200);
+      }, REACTION_INPUT_WINDOW_MS);
     }, delay);
   }, [clearReactionTimers, stage.variantId]);
 
@@ -448,7 +451,7 @@ function ReactionStage({ stage, onProgress, onComplete }) {
       <div className="mx-auto mt-5 w-full max-w-sm">
         <div className="mb-4 rounded-2xl border border-white/10 bg-slate-900/65 px-4 py-3 text-center">
           <div className="text-[11px] font-extrabold tracking-[0.18em] text-cyan-300/80">
-            {phase === "active" ? "지금 누르세요" : "대기 중"}
+          {phase === "active" ? "지금 누르세요 · 입력 시간 2초" : "대기 중"}
           </div>
           <div className="mt-1 text-lg font-black text-white">{getReactionPrompt(stage.variantId, target)}</div>
         </div>
@@ -546,7 +549,7 @@ function FocusStage({ stage, onProgress, onComplete }) {
       setWrong((prev) => prev + 1);
       setScore((prev) => Math.max(0, prev - 25));
       setRound(createFocusRound(stage.variantId));
-    }, 2600);
+    }, FOCUS_INPUT_WINDOW_MS);
   }, [round, stage.variantId]);
 
   useEffect(() => {
@@ -620,7 +623,7 @@ function FocusStage({ stage, onProgress, onComplete }) {
         </div>
 
         <div className="mt-4 text-center text-xs font-extrabold tracking-[0.2em] text-orange-200/90">
-          {lastLatency ? `LAST ${lastLatency}MS` : "TARGET ONLY"}
+          {lastLatency ? `LAST ${lastLatency}MS` : "입력 시간 3.5초"}
         </div>
       </div>
     </StageSurface>
@@ -989,7 +992,7 @@ function RhythmStage({ stage, onProgress, onComplete }) {
     const timer = window.setInterval(() => {
       setBeat((prev) => prev + 1);
       setGoodWindow(true);
-      window.setTimeout(() => setGoodWindow(false), 420);
+      window.setTimeout(() => setGoodWindow(false), RHYTHM_INPUT_WINDOW_MS);
     }, 1100);
 
     return () => window.clearInterval(timer);
@@ -1031,7 +1034,7 @@ function RhythmStage({ stage, onProgress, onComplete }) {
               : "border-white/10 bg-white/10 text-slate-200"
           }`}
         >
-          {goodWindow ? "지금" : "대기"}
+          {goodWindow ? "지금 · 0.65초" : "대기"}
         </button>
         <div className="mt-6 grid w-full grid-cols-2 gap-3 text-center">
           <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
