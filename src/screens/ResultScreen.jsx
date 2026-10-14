@@ -26,7 +26,6 @@ import {
 import { getRetestPlan, getSharePersonaSummary } from "../lib/engagement";
 import { SoundManager } from "../lib/soundManager";
 import { getAgeComparison, getGrade, getInterpretation } from "../lib/scoring";
-import { grantResultPromotionReward } from "../lib/promotionReward";
 import { trackEvent } from "../lib/analytics";
 
 function SegmentTabs({ value, onChange, items }) {
@@ -166,10 +165,6 @@ export function ResultScreen({
   useEffect(() => {
     SoundManager.playSuccess();
   }, []);
-
-  useEffect(() => {
-    grantResultPromotionReward(result);
-  }, [result]);
 
   const todayStr = new Date().toLocaleDateString("ko-KR", {
     month: "long",

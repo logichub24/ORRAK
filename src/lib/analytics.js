@@ -112,8 +112,6 @@ export function getAnalyticsSummary() {
     totalEvents: events.length,
     appOpens: events.filter((event) => event.name === "app_open").length,
     screenViews: events.filter((event) => event.name === "screen_view").length,
-    promotionResponses: events.filter((event) => event.name === "promotion_reward_response").length,
-    promotionErrors: events.filter((event) => event.name === "promotion_reward_error").length,
     uniqueVisitors: uniqueVisitors.size,
     uniqueSessions: uniqueSessions.size,
     latestEventAt: events[0]?.at || null,
