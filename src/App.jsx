@@ -1,4 +1,5 @@
-﻿import React, { useEffect, useMemo, useState } from "react";
+﻿import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { graniteEvent, Screen } from "@apps-in-toss/web-framework";
 import { BarChart2, Home, Sparkles } from "lucide-react";
 import { AdOverlay } from "./components/AdOverlay";
 import { useDataService } from "./hooks/useDataService";
@@ -119,6 +120,7 @@ function shouldShowResultInterstitial(totalPlays) {
 
 export default function App() {
   const [screen, setScreen] = useState("splash");
+  const screenHistoryRef = useRef([]);
   const [currentResult, setCurrentResult] = useState(null);
   const [adState, setAdState] = useState(null);
   const [insightsUnlocked, setInsightsUnlocked] = useState(false);
@@ -130,6 +132,46 @@ export default function App() {
   });
   const dataService = useDataService();
   const engine = useMemo(() => createLhAiEngine(), []);
+
+  const navigate = useCallback((nextScreen, { replace = false, reset = false } = {}) => {
+    setScreen((currentScreen) => {
+      if (currentScreen === nextScreen) return currentScreen;
+
+      if (reset) {
+        screenHistoryRef.current = [];
+      } else if (!replace) {
+        screenHistoryRef.current.push(currentScreen);
+      }
+
+      return nextScreen;
+    });
+  }, []);
+
+  const goBack = useCallback(() => {
+    const previousScreen = screenHistoryRef.current.pop();
+    if (!previousScreen) return false;
+
+    setScreen(previousScreen);
+    return true;
+  }, []);
+
+  useEffect(() => {
+    try {
+      return graniteEvent.addEventListener("backEvent", {
+        onEvent: () => {
+          if (!goBack()) {
+            try {
+              Screen.close().catch(() => undefined);
+            } catch {
+              // 웹 브라우저에서는 종료 브리지가 없을 수 있어요.
+            }
+          }
+        },
+      });
+    } catch {
+      return undefined;
+    }
+  }, [goBack]);
 
   useEffect(() => {
     trackAppOpen({ initialScreen: screen, distribution: getDistributionChannel() });
@@ -243,7 +285,7 @@ export default function App() {
       setInsightsUnlocked(false);
       dataService.saveResult(result);
       setCurrentResult(resultWithAchievements);
-      setScreen("result");
+      navigate("result", { replace: true });
     };
 
     const shouldShowInterstitial =
@@ -268,7 +310,7 @@ export default function App() {
     trackEvent("reward_requested", { feature: "retry_measure" });
     await runRewardOrFallback({
       onRewarded: () => {
-        setScreen("measure");
+        navigate("measure");
       },
       onFallbackOverlay: () =>
         setAdState({
@@ -276,7 +318,7 @@ export default function App() {
           onComplete: (success) => {
             setAdState(null);
             if (success) {
-              setScreen("measure");
+              navigate("measure");
             }
           },
         }),
@@ -303,19 +345,19 @@ export default function App() {
   };
 
   const handleSplashDone = () => {
-    setScreen("home");
+    navigate("home", { reset: true });
   };
 
   const handleOnboardingDone = () => {
     completeOnboarding();
     setNeedsOnboarding(false);
-    setScreen("home");
+    navigate("home", { reset: true });
   };
 
   const handleReplayOnboarding = () => {
     resetOnboarding();
     setNeedsOnboarding(true);
-    setScreen("onboarding");
+    navigate("onboarding");
   };
 
   const showBottomNav = screen !== "splash" && screen !== "measure" && screen !== "onboarding";
@@ -339,18 +381,18 @@ export default function App() {
         {screen === "onboarding" ? <OnboardingScreen onDone={handleOnboardingDone} /> : null}
         {screen === "home" ? (
           <HomeScreen
-            onStart={() => setScreen("measure")}
-            onRecord={() => setScreen("record")}
+            onStart={() => navigate("measure")}
+            onRecord={() => navigate("record")}
             onCoach={(tab) => {
               setCoachInitialTab(tab || "schedule");
-              setScreen("coach");
+              navigate("coach");
             }}
             dataService={dataService}
           />
         ) : null}
         {screen === "coach" ? (
           <AiCoachScreen
-            onBack={() => setScreen("home")}
+            onBack={goBack}
             engine={engine}
             dataService={dataService}
             initialTab={coachInitialTab}
@@ -360,7 +402,7 @@ export default function App() {
         {screen === "result" && currentResult ? (
           <ResultScreen
             result={currentResult}
-            onHome={() => setScreen("home")}
+            onHome={() => navigate("home", { reset: true })}
             onRetry={handleRetry}
             onUnlockInsights={handleUnlockInsights}
             insightsUnlocked={insightsUnlocked}
@@ -369,13 +411,13 @@ export default function App() {
             preferredAgeGroup={dataService.data.profile.preferredAgeGroup}
             onCoach={(tab) => {
               setCoachInitialTab(tab || "schedule");
-              setScreen("coach");
+              navigate("coach");
             }}
           />
         ) : null}
         {screen === "record" ? (
           <RecordScreen
-            onBack={() => setScreen("home")}
+            onBack={goBack}
             dataService={dataService}
             engine={engine}
             onReplayOnboarding={handleReplayOnboarding}
@@ -388,13 +430,13 @@ export default function App() {
           {showBottomNav ? (
             <BottomNavigation
               screen={screen}
-              onHome={() => setScreen("home")}
+              onHome={() => navigate("home", { reset: true })}
               onCoach={() => {
                 setCoachInitialTab("schedule");
-                setScreen("coach");
+                navigate("coach");
               }}
-              onMeasure={() => setScreen("measure")}
-              onRecord={() => setScreen("record")}
+              onMeasure={() => navigate("measure")}
+              onRecord={() => navigate("record")}
             />
           ) : null}
         </div>
